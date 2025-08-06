@@ -1,0 +1,53 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local WindUI = getgenv().WindUI
+local running = true
+
+local function cleanConstraints(char)
+    local found = false
+    for _, v in ipairs(char:GetDescendants()) do
+        if v:IsA("RopeConstraint") or v:IsA("AlignPosition") or v:IsA("AlignOrientation") then
+            v:Destroy()
+            found = true
+        end
+    end
+    return found
+end
+
+-- Loop utama
+local thread = task.spawn(function()
+    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    while running do
+        if cleanConstraints(char) then
+            WindUI:Notify({
+                Title = "Anti Trap Reactive",
+                Content = "Constraint terdeteksi dan dihapus!",
+                Icon = "rbxassetid://85151307796718"
+            })
+        end
+        task.wait(0.2)
+    end
+end)
+
+-- Handle karakter baru
+local charConn = LocalPlayer.CharacterAdded:Connect(function(newChar)
+    task.wait(1)
+    while running do
+        if cleanConstraints(newChar) then
+            WindUI:Notify({
+                Title = "Anti Trap Reactive",
+                Content = "Constraint terdeteksi dan dihapus!",
+                Icon = "rbxassetid://85151307796718"
+            })
+        end
+        task.wait(0.2)
+    end
+end)
+
+-- Fungsi cleanup
+getgenv().AntiTrapCleanup = function()
+    running = false
+    if charConn then charConn:Disconnect() end
+    if thread then task.cancel(thread) end
+    getgenv().AntiTrapCleanup = nil
+end
