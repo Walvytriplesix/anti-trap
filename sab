@@ -1,4 +1,4 @@
-local Players = game:GetService("Players")
+ocal Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local WindUI = getgenv().WindUI
 local running = true
@@ -14,6 +14,7 @@ local function cleanConstraints(char)
     return found
 end
 
+-- Loop utama
 local thread = task.spawn(function()
     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
     while running do
@@ -28,6 +29,7 @@ local thread = task.spawn(function()
     end
 end)
 
+-- Handle karakter baru
 local charConn = LocalPlayer.CharacterAdded:Connect(function(newChar)
     task.wait(1)
     while running do
@@ -42,6 +44,7 @@ local charConn = LocalPlayer.CharacterAdded:Connect(function(newChar)
     end
 end)
 
+-- Fungsi cleanup
 getgenv().AntiTrapCleanup = function()
     running = false
     if charConn then charConn:Disconnect() end
